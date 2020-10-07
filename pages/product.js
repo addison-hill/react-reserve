@@ -19,4 +19,4 @@ Product.getInitialProps = async ({ query: { _id } }) => {
   return { product: response.data }
 }
 
-export default Product;
+export default Product
