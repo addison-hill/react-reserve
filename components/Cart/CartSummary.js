@@ -1,34 +1,48 @@
-import React from 'react'
-import { Button, Segment, Divider } from 'semantic-ui-react'
-import calculateCartTotal from '../../utils/calculateCartTotal'
+import React from "react";
+import StripeCheckout from "react-stripe-checkout";
+import { Button, Segment, Divider } from "semantic-ui-react";
+import calculateCartTotal from "../../utils/calculateCartTotal";
 
-function CartSummary({ products }) {
-  const [cartAmount, setCartAmount] = React.useState(0)
-  const [stripeAmount, setStripeAmount] = React.useState(0)
-  const [isCartEmpty, setCartEmpty] = React.useState(false)
+function CartSummary({ products, handleCheckout, success }) {
+  const [cartAmount, setCartAmount] = React.useState(0);
+  const [stripeAmount, setStripeAmount] = React.useState(0);
+  const [isCartEmpty, setCartEmpty] = React.useState(false);
 
   React.useEffect(() => {
-    const { cartTotal, stripeTotal } = calculateCartTotal(products)
-    setCartAmount(cartTotal)
-    setStripeAmount(stripeTotal)
-    setCartEmpty(products.length === 0)
-  }, [products])
+    const { cartTotal, stripeTotal } = calculateCartTotal(products);
+    setCartAmount(cartTotal);
+    setStripeAmount(stripeTotal);
+    setCartEmpty(products.length === 0);
+  }, [products]);
 
   return (
     <>
-      <Divider/>
+      <Divider />
       <Segment clearing size="large">
         <strong>Sub total:</strong> ${cartAmount}
-        <Button 
-          icon="cart" 
-          disabled={isCartEmpty}
-          color="teal" 
-          floated="right" 
-          content="Checkout" 
-        />
+        <StripeCheckout
+          name="React Reserve"
+          amount={stripeAmount}
+          image={products.length > 0 ? products[0].product.mediaUrl : ""}
+          currency="USD"
+          shippingAddress={true}
+          billingAddress={true}
+          zipCode={true}
+          stripeKey="pk_test_51J1GXPEQXW5LlApoeM4IihgHQGvI221Q3OF9H4HmaZ7UT2dV2Hcy7DdVipUix5YD5owV3nKwWOJoqISFF1VPH1iG00gvWb1rk9"
+          token={handleCheckout}
+          triggerEvent="onClick"
+        >
+          <Button
+            icon="cart"
+            disabled={isCartEmpty || success}
+            color="teal"
+            floated="right"
+            content="Checkout"
+          />
+        </StripeCheckout>
       </Segment>
     </>
-  )
+  );
 }
 
 export default CartSummary;
